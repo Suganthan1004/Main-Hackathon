@@ -8,8 +8,8 @@ const WelcomeBar = () => {
     <div className="navbar">
       <div className="navbar-welcome">
         {isLoggedIn
-          ? <>Welcome, <span>{user?.name}</span> 👋</>
-          : <>🍕 <span>Go Foodie</span></>
+          ? <>Welcome, <span>{user?.name || user?.email}</span></>
+          : <span>Go Foodie</span>
         }
       </div>
     </div>

@@ -39,13 +39,13 @@ const RestaurantPage = () => {
     if (type === "all") {
       setFiltered(menu)
     } else if (type === "veg") {
-      setFiltered(menu.filter((item) => item.veg === true))
+      setFiltered(menu.filter((item) => item.isVeg === true))
     } else if (type === "nonveg") {
-      setFiltered(menu.filter((item) => item.veg === false))
+      setFiltered(menu.filter((item) => item.isVeg === false))
     }
   }
 
-  // get unique categories from menu
+  // get unique categories from menu items
   const categories = [...new Set(menu.map((item) => item.category).filter(Boolean))]
 
   const handleFilterByCategory = (cat) => {
@@ -60,7 +60,6 @@ const RestaurantPage = () => {
   const handleRemove = (item) => {
     const qty = getItemQuantity(item.id)
     if (qty === 1) {
-      // show warning before removing last one
       setRemovalTarget(item)
     } else {
       removeItem(item.id)
@@ -82,7 +81,6 @@ const RestaurantPage = () => {
       <button className="back-btn" onClick={() => navigate("/")}>← Back to Restaurants</button>
       <h2 className="page-title">Menu</h2>
 
-      {/* filter row */}
       <div className="filter-row">
         <button
           className={`filter-pill ${activeFilter === "all" ? "active" : ""}`}

@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "../store/cartStore"
+import { useAuth } from "../store/authStore"
 import { createOrder } from "../services/orderService"
 import ItemCard from "../components/restaurant/ItemCard"
 import RemovalWarningPopup from "../components/cart/RemovalWarningPopup"
@@ -8,10 +9,13 @@ import RemovalWarningPopup from "../components/cart/RemovalWarningPopup"
 const CartPage = () => {
   const navigate = useNavigate()
   const { cartItems, addItem, removeItem, deleteItem, getItemQuantity, clearCart, totalPrice, restaurantId } = useCart()
+  const { user } = useAuth()
+
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [removalTarget, setRemovalTarget] = useState(null)
+  const [address, setAddress] = useState(user?.address || "")
 
   const handleAdd = (item) => {
     addItem(item, restaurantId)
@@ -39,10 +43,11 @@ const CartPage = () => {
     setError("")
     try {
       const payload = {
-        restaurantId,
+        address: address || undefined,
         items: cartItems.map((ci) => ({
           menuItemId: ci.menuItemId,
-          quantity: ci.quantity
+          quantity: ci.quantity,
+          price: ci.price
         }))
       }
       await createOrder(payload)
@@ -55,7 +60,6 @@ const CartPage = () => {
     }
   }
 
-  // order success overlay
   if (orderPlaced) {
     return (
       <div className="order-success-overlay">
@@ -95,6 +99,19 @@ const CartPage = () => {
               context="cart"
             />
           ))}
+
+          <div style={{ marginTop: "1.5rem", maxWidth: "500px" }}>
+            <div className="form-group">
+              <label className="form-label">Delivery Address</label>
+              <input
+                className="form-input"
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Enter delivery address (optional if saved in profile)"
+              />
+            </div>
+          </div>
 
           <div className="cart-summary">
             <div className="cart-total">Total: ₹{totalPrice}</div>

@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null)
   const [loading, setLoading] = useState(false)
 
+  // hydrate from localstorage on mount
   useEffect(() => {
     const savedToken = localStorage.getItem("token")
     const savedUser = localStorage.getItem("user")
@@ -21,18 +22,26 @@ export const AuthProvider = ({ children }) => {
 
   const loginUser = async (credentials) => {
     setLoading(true)
-    const data = await loginApi(credentials)
-    setToken(data.token)
-    setUser(data.user)
-    setLoading(false)
-    return data
+    try {
+      const data = await loginApi(credentials)
+      setToken(data.token)
+      // backend returns { token, role } so we build user from what we have
+      const userObj = { email: credentials.email, role: data.role }
+      setUser(userObj)
+      return data
+    } finally {
+      setLoading(false)
+    }
   }
 
   const registerUser = async (userData) => {
     setLoading(true)
-    const data = await registerApi(userData)
-    setLoading(false)
-    return data
+    try {
+      const data = await registerApi(userData)
+      return data
+    } finally {
+      setLoading(false)
+    }
   }
 
   const logoutUser = () => {
@@ -42,9 +51,10 @@ export const AuthProvider = ({ children }) => {
     setUser(null)
   }
 
-  const updateUserState = (updatedUser) => {
-    setUser(updatedUser)
-    localStorage.setItem("user", JSON.stringify(updatedUser))
+  const updateUserState = (updates) => {
+    const updated = { ...user, ...updates }
+    setUser(updated)
+    localStorage.setItem("user", JSON.stringify(updated))
   }
 
   const isLoggedIn = !!token
