@@ -1,15 +1,48 @@
-import React, { createContext, useContext, useState } from "react"
+import React, { createContext, useContext, useState, useEffect } from "react"
 
 const CartContext = createContext()
 
-export const useCart = () => useContext(CartContext)
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
+}
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([])
   const [restaurantId, setRestaurantId] = useState(null)
 
+  // Load from localStorage on mount
+  useEffect(() => {
+    const storedCart = localStorage.getItem("cart");
+    const storedRestId = localStorage.getItem("restaurantId");
+    if (storedCart) {
+      try {
+        setCartItems(JSON.parse(storedCart));
+        if (storedRestId) setRestaurantId(storedRestId);
+      } catch (e) {
+        console.error("Failed to parse cart items", e);
+        localStorage.removeItem("cart");
+        localStorage.removeItem("restaurantId");
+      }
+    }
+  }, []);
+
+  // Save to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cartItems));
+    if (restaurantId) {
+      localStorage.setItem("restaurantId", restaurantId);
+    } else {
+      localStorage.removeItem("restaurantId");
+    }
+  }, [cartItems, restaurantId]);
+
   const addItem = (item, restId) => {
     if (restaurantId && restaurantId !== restId) {
+      // Different restaurant - clear cart
       setCartItems([])
     }
     setRestaurantId(restId)

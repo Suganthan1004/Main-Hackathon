@@ -20,18 +20,30 @@ export const AuthProvider = ({ children }) => {
     }
   }, [])
 
+  // Save to localStorage whenever user or token changes
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
+
   const loginUser = async (credentials) => {
     setLoading(true)
-    try {
-      const data = await loginApi(credentials)
-      setToken(data.token)
-      // backend returns { token, role } so we build user from what we have
-      const userObj = { email: credentials.email, role: data.role }
-      setUser(userObj)
-      return data
-    } finally {
-      setLoading(false)
-    }
+    const data = await loginApi(credentials)
+    setToken(data.token)
+    setUser(data.user)
+    setLoading(false)
+    return data
   }
 
   const registerUser = async (userData) => {
@@ -45,16 +57,13 @@ export const AuthProvider = ({ children }) => {
   }
 
   const logoutUser = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
     setToken(null)
     setUser(null)
   }
 
-  const updateUserState = (updates) => {
-    const updated = { ...user, ...updates }
-    setUser(updated)
-    localStorage.setItem("user", JSON.stringify(updated))
+  const updateUserState = (updatedUser) => {
+    setUser(updatedUser)
+    localStorage.setItem("user", JSON.stringify(updatedUser))
   }
 
   const isLoggedIn = !!token
@@ -68,3 +77,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   )
 }
+

@@ -7,14 +7,12 @@ const delay = (ms) => new Promise(r => setTimeout(r, ms))
 const mockLogin = async (credentials) => {
   await delay(500)
   const dummyToken = "dummy-jwt-token-12345"
-  const role = "USER"
-  localStorage.setItem("token", dummyToken)
-  // backend only returns token+role, we store email from the form
-  localStorage.setItem("user", JSON.stringify({
-    email: credentials.email,
-    role
-  }))
-  return { token: dummyToken, role }
+  const dummyUser = {
+    id: 1,
+    name: "Test User",
+    email: credentials.email || "test@example.com"
+  }
+  return { token: dummyToken, user: dummyUser }
 }
 
 const mockRegister = async (userData) => {
@@ -25,12 +23,6 @@ const mockRegister = async (userData) => {
 // real
 const realLogin = async (credentials) => {
   const response = await api.post("/auth/login", credentials)
-  const { token, role } = response.data
-  localStorage.setItem("token", token)
-  localStorage.setItem("user", JSON.stringify({
-    email: credentials.email,
-    role
-  }))
   return response.data
 }
 
