@@ -23,7 +23,7 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        // 🔥 ensures proper 256-bit key
+        // ensures 256-bit key
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
