@@ -15,8 +15,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* auth pages sit outside the main layout */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="login" element={<LoginPage />} />
+      <Route path="register" element={<RegisterPage />} />
 
       {/* everything else is inside the sidebar layout */}
       <Route path="/" element={<MainLayout />}>
