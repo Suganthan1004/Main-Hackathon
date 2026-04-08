@@ -22,9 +22,17 @@ public class RestaurantService {
     }
 
     public List<MenuItem> getMenuByRestaurantId(Long restaurantId) {
+
+        System.out.println("Restaurant ID: " + restaurantId);
+
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new ResourceNotFoundException("Restaurant not found: " + restaurantId);
         }
-        return menuItemRepository.findByRestaurant_Id(restaurantId);
+
+        List<MenuItem> items = menuItemRepository.findByRestaurant_Id(restaurantId);
+
+        System.out.println("Items size: " + items.size());
+
+        return items;
     }
 }

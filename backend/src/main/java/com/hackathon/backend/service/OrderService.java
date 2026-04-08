@@ -78,13 +78,8 @@ public class OrderService {
                 .map(item -> new OrderItemDetails(item.getMenuItem().getName(), item.getQuantity(), item.getPrice()))
                 .collect(Collectors.toList());
 
-        return new OrderDetailsResponse(
-                order.getId(),
-                order.getStatus(),
-                order.getTotalAmount(),
-                order.getAddress(),
-                items
-        );
+        return new OrderDetailsResponse(order.getId(), order.getUserId(), order.getTotalAmount(),
+                order.getStatus(), order.getAddress(), order.getCreatedAt(), items);
     }
 
     @Transactional

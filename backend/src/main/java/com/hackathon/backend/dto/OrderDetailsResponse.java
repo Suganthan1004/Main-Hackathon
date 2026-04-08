@@ -11,10 +11,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetailsResponse {
-
-    private Long orderId;
-    private String status;
+    private Long id;
+    private Long userId;
     private Double totalAmount;
+    private String status;
     private String address;
+    private LocalDateTime createdAt;
     private List<OrderItemDetails> items;
 }
