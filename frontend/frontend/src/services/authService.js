@@ -3,14 +3,6 @@ import { USE_MOCK } from "./config"
 
 const delay = (ms) => new Promise(r => setTimeout(r, ms))
 
-<<<<<<< HEAD
-// POST /auth/login
-// Returns { user, token } or similar
-export const login = async (credentials) => {
-  const response = await api.post("/auth/login", credentials);
-  return response.data;
-};
-=======
 // mock auth for frontend testing
 const mockLogin = async (credentials) => {
   await delay(500)
@@ -20,8 +12,6 @@ const mockLogin = async (credentials) => {
     name: "Test User",
     email: credentials.email || "test@example.com"
   }
-  localStorage.setItem("token", dummyToken)
-  localStorage.setItem("user", JSON.stringify(dummyUser))
   return { token: dummyToken, user: dummyUser }
 }
 
@@ -33,10 +23,6 @@ const mockRegister = async (userData) => {
 // real backend calls
 const realLogin = async (credentials) => {
   const response = await api.post("/auth/login", credentials)
-  if (response.data.token) {
-    localStorage.setItem("token", response.data.token)
-    localStorage.setItem("user", JSON.stringify(response.data.user || response.data))
-  }
   return response.data
 }
 
@@ -57,4 +43,3 @@ export const logout = () => {
 export const isAuthenticated = () => {
   return !!localStorage.getItem("token")
 }
->>>>>>> 085968741fc0df5d0825938b78e3ef116d6f1212

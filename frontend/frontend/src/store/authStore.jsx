@@ -19,32 +19,52 @@ export const AuthProvider = ({ children }) => {
     }
   }, [])
 
+  // Save to localStorage whenever user or token changes
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
+
   const loginUser = async (credentials) => {
     setLoading(true)
-    const data = await loginApi(credentials)
-    setToken(data.token)
-    setUser(data.user)
-    setLoading(false)
-    return data
+    try {
+      const data = await loginApi(credentials)
+      setToken(data.token)
+      setUser(data.user)
+      return data
+    } finally {
+      setLoading(false)
+    }
   }
 
   const registerUser = async (userData) => {
     setLoading(true)
-    const data = await registerApi(userData)
-    setLoading(false)
-    return data
+    try {
+      const data = await registerApi(userData)
+      return data
+    } finally {
+      setLoading(false)
+    }
   }
 
   const logoutUser = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
     setToken(null)
     setUser(null)
   }
 
   const updateUserState = (updatedUser) => {
-    setUser(updatedUser)
-    localStorage.setItem("user", JSON.stringify(updatedUser))
+    setUser(prev => ({ ...prev, ...updatedUser }))
   }
 
   const isLoggedIn = !!token
@@ -58,3 +78,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   )
 }
+
