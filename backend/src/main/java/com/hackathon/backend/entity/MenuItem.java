@@ -1,12 +1,14 @@
 package com.hackathon.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "menu_item")
+@Table(name = "menu_items")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,7 +24,8 @@ public class MenuItem {
     private String category;
     private Boolean isVeg;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "restaurant_id")
+    @JsonIgnore
     private Restaurant restaurant;
 }

@@ -25,6 +25,6 @@ public class RestaurantService {
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new ResourceNotFoundException("Restaurant not found: " + restaurantId);
         }
-        return menuItemRepository.findByRestaurantId(restaurantId);
+        return menuItemRepository.findByRestaurant_Id(restaurantId);
     }
 }
