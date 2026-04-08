@@ -1,17 +1,19 @@
-import React from "react";
+import React from "react"
+import { useAuth } from "../../store/authStore"
 
-const WelcomeBar = ({ user }) => {
+const WelcomeBar = () => {
+  const { user, isLoggedIn } = useAuth()
+
   return (
-    <div>
-      <h1>
-        GO FOODIE
-      </h1>
-
-      <div>
-        Welcome, {user?.name || "Guest"} 👋
+    <div className="navbar">
+      <div className="navbar-welcome">
+        {isLoggedIn
+          ? <>Welcome, <span>{user?.name}</span> 👋</>
+          : <>🍕 <span>Go Foodie</span></>
+        }
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default WelcomeBar;
+export default WelcomeBar

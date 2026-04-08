@@ -1,13 +1,22 @@
-import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import AppRoutes from './routes/AppRoutes';
+import React from "react"
+import { BrowserRouter } from "react-router-dom"
+import { AuthProvider } from "./store/authStore"
+import { CartProvider } from "./store/cartStore"
+import { OrderProvider } from "./store/orderStore"
+import AppRoutes from "./routes/AppRoutes"
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
-  );
+    <AuthProvider>
+      <CartProvider>
+        <OrderProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </OrderProvider>
+      </CartProvider>
+    </AuthProvider>
+  )
 }
 
-export default App;
+export default App
