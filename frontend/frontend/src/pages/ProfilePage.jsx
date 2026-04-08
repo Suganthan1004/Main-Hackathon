@@ -1,181 +1,81 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { updateUser } from '../services/userService';
-import { useAuth } from '../store/authStore';
-import { useEffect } from 'react';
+import React, { useState } from "react"
+import { useAuth } from "../store/authStore"
+import { updateUser } from "../services/userService"
 
-function ProfilePage() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+const ProfilePage = () => {
+  const { user, updateUserState } = useAuth()
+  const [name, setName] = useState(user?.name || "")
+  const [email, setEmail] = useState(user?.email || "")
+  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState("")
+  const [error, setError] = useState("")
 
-  useEffect(() => {
-    if (user) {
-      setName(user.name || '');
-      setEmail(user.email || '');
-    }
-  }, [user]);
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setMessage("")
+    setError("")
+    setLoading(true)
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    setError('');
-    setMessage('');
-    setLoading(true);
+    const payload = {}
+    if (name) payload.name = name
+    if (email) payload.email = email
+    if (password) payload.password = password
+
     try {
-      const payload = {};
-      if (name) payload.name = name;
-      if (email) payload.email = email;
-      if (password) payload.password = password;
-      await updateUser(payload);
-      setMessage('Profile updated successfully!');
+      const updatedUser = await updateUser(payload)
+      // update context with new data
+      updateUserState({ ...user, ...payload, ...updatedUser })
+      setMessage("Profile updated successfully")
+      setPassword("")
     } catch (err) {
-      setError(err.response?.data?.message || 'Update failed.');
+      setError(err.response?.data?.message || "Update failed")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <button style={styles.backBtn} onClick={() => navigate('/restaurants')}>← Home</button>
-        <h1 style={styles.title}>Profile</h1>
-        <div />
-      </div>
+    <div>
+      <h2 className="page-title">Profile</h2>
 
-      <form onSubmit={handleUpdate} style={styles.form}>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Name</label>
+      <form className="profile-form" onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label className="form-label">Name</label>
           <input
+            className="form-input"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={styles.input}
-            placeholder="Enter new name"
           />
         </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Email</label>
+        <div className="form-group">
+          <label className="form-label">Email</label>
           <input
+            className="form-input"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={styles.input}
-            placeholder="Enter new email"
           />
         </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Password</label>
+        <div className="form-group">
+          <label className="form-label">New Password</label>
           <input
+            className="form-input"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={styles.input}
-            placeholder="Enter new password"
+            placeholder="Leave blank to keep current"
           />
         </div>
-        <button type="submit" style={styles.button} disabled={loading}>
-          {loading ? 'Updating...' : 'Update Profile'}
+        <button className="form-submit-btn" type="submit" disabled={loading}>
+          {loading ? "Updating..." : "Update Profile"}
         </button>
-        {message && <p style={styles.success}>{message}</p>}
-        {error && <p style={styles.error}>{error}</p>}
+        {message && <p className="msg-success">{message}</p>}
+        {error && <p className="msg-error">{error}</p>}
       </form>
     </div>
-  );
+  )
 }
 
-const styles = {
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#fff3e0',
-    padding: '2rem',
-    fontFamily: 'system-ui, -apple-system, sans-serif'
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '2rem',
-    flexWrap: 'wrap',
-    gap: '1rem'
-  },
-  title: {
-    color: '#ff6b00',
-    fontWeight: '800',
-    fontSize: '2.5rem',
-    margin: 0
-  },
-  backBtn: {
-    backgroundColor: '#ffffff',
-    color: '#ff6b00',
-    padding: '0.6rem 1.5rem',
-    border: '2px solid #ff6b00',
-    borderRadius: '999px',
-    fontSize: '0.95rem',
-    fontWeight: 'bold',
-    cursor: 'pointer'
-  },
-  form: {
-    backgroundColor: '#ffffff',
-    padding: '2.5rem',
-    borderRadius: '24px',
-    boxShadow: '0 10px 30px rgba(255, 107, 0, 0.1)',
-    maxWidth: '400px',
-    margin: '0 auto',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.2rem'
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.6rem'
-  },
-  label: {
-    color: '#555',
-    fontSize: '0.95rem',
-    fontWeight: '600',
-    marginLeft: '0.5rem'
-  },
-  input: {
-    padding: '1rem 1.2rem',
-    border: '2px solid transparent',
-    backgroundColor: '#fff7f0',
-    borderRadius: '999px',
-    fontSize: '1rem',
-    outline: 'none',
-    transition: 'all 0.3s ease'
-  },
-  button: {
-    backgroundColor: '#ff6b00',
-    color: '#ffffff',
-    padding: '1rem',
-    border: 'none',
-    borderRadius: '999px',
-    fontSize: '1.1rem',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    marginTop: '1rem',
-    boxShadow: '0 4px 15px rgba(255, 107, 0, 0.3)',
-    transition: 'all 0.3s ease'
-  },
-  success: {
-    color: '#2e7d32',
-    fontWeight: '600',
-    textAlign: 'center',
-    marginTop: '0.5rem'
-  },
-  error: {
-    color: '#e53935',
-    fontWeight: '600',
-    textAlign: 'center',
-    marginTop: '0.5rem'
-  }
-};
-
-export default ProfilePage;
+export default ProfilePage

@@ -1,75 +1,61 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import LoginForm from '../components/auth/LoginForm';
-import { login } from '../services/authService';
-import { useAuth } from '../store/authStore';
+import React, { useState } from "react"
+import { useNavigate, Link } from "react-router-dom"
+import { useAuth } from "../store/authStore"
 
 const LoginPage = () => {
-  const navigate = useNavigate();
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
+  const { loginUser, loading } = useAuth()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
 
-  const { login: contextLogin } = useAuth();
-
-  const handleLogin = async (credentials) => {
-    setError('');
-    setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError("")
     try {
-      const data = await login(credentials);
-      // data should contain { user, token }
-      contextLogin(data.user, data.token);
-      navigate('/restaurants');
+      await loginUser({ email, password })
+      navigate("/")
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
-    } finally {
-      setLoading(false);
+      setError(err.response?.data?.message || "Login failed")
     }
-  };
-
+  }
 
   return (
-    <div style={styles.page}>
-      <LoginForm onLogin={handleLogin} />
-      {error && <p style={styles.error}>{error}</p>}
-      {loading && <p style={styles.loading}>Logging in...</p>}
-      <p style={styles.linkText}>
-        Don't have an account? <a href="/register" style={styles.link}>Register here</a>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h2 className="auth-title">Login</h2>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Email</label>
+            <input
+              className="form-input"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Password</label>
+            <input
+              className="form-input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button className="form-submit-btn" type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
+          {error && <p className="msg-error">{error}</p>}
+        </form>
+      </div>
+      <p className="auth-link">
+        Don't have an account? <Link to="/register">Register here</Link>
       </p>
     </div>
-  );
-};
+  )
+}
 
-const styles = {
-  page: {
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff3e0',
-    padding: '1rem',
-    fontFamily: 'system-ui, -apple-system, sans-serif'
-  },
-  linkText: {
-    marginTop: '1.5rem',
-    color: '#333'
-  },
-  link: {
-    color: '#ff6b00',
-    textDecoration: 'none',
-    fontWeight: 'bold'
-  },
-  error: {
-    color: '#e53935',
-    marginTop: '1rem',
-    fontWeight: '600',
-    textAlign: 'center'
-  },
-  loading: {
-    color: '#ff6b00',
-    marginTop: '1rem',
-    fontWeight: '600'
-  }
-};
-
-export default LoginPage;
+export default LoginPage

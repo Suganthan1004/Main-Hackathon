@@ -1,69 +1,89 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import RegisterForm from '../components/auth/RegisterForm';
-import { register } from '../services/authService';
+import React, { useState } from "react"
+import { useNavigate, Link } from "react-router-dom"
+import { useAuth } from "../store/authStore"
 
 const RegisterPage = () => {
-  const navigate = useNavigate();
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
+  const { registerUser, loading } = useAuth()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [error, setError] = useState("")
 
-  const handleRegister = async (data) => {
-    setError('');
-    setLoading(true);
-    try {
-      await register(data);
-      navigate('/login');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
-    } finally {
-      setLoading(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError("")
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match")
+      return
     }
-  };
+
+    try {
+      await registerUser({ name, email, password })
+      navigate("/login")
+    } catch (err) {
+      setError(err.response?.data?.message || "Registration failed")
+    }
+  }
 
   return (
-    <div style={styles.page}>
-      <RegisterForm onRegister={handleRegister} />
-      {error && <p style={styles.error}>{error}</p>}
-      {loading && <p style={styles.loading}>Creating account...</p>}
-      <p style={styles.linkText}>
-        Already have an account? <a href="/login" style={styles.link}>Login here</a>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h2 className="auth-title">Register</h2>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Name</label>
+            <input
+              className="form-input"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Email</label>
+            <input
+              className="form-input"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Password</label>
+            <input
+              className="form-input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Confirm Password</label>
+            <input
+              className="form-input"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button className="form-submit-btn" type="submit" disabled={loading}>
+            {loading ? "Creating account..." : "Register"}
+          </button>
+          {error && <p className="msg-error">{error}</p>}
+        </form>
+      </div>
+      <p className="auth-link">
+        Already have an account? <Link to="/login">Login here</Link>
       </p>
     </div>
-  );
-};
+  )
+}
 
-const styles = {
-  page: {
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff3e0',
-    padding: '1rem',
-    fontFamily: 'system-ui, -apple-system, sans-serif'
-  },
-  linkText: {
-    marginTop: '1.5rem',
-    color: '#333'
-  },
-  link: {
-    color: '#ff6b00',
-    textDecoration: 'none',
-    fontWeight: 'bold'
-  },
-  error: {
-    color: '#e53935',
-    marginTop: '1rem',
-    fontWeight: '600',
-    textAlign: 'center'
-  },
-  loading: {
-    color: '#ff6b00',
-    marginTop: '1rem',
-    fontWeight: '600'
-  }
-};
-
-export default RegisterPage;
+export default RegisterPage

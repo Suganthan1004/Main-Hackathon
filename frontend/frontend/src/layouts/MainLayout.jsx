@@ -1,28 +1,20 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
-import Sidebar from "../components/common/Sidebar";
-import WelcomeBar from "../components/common/WelcomeBar";
+import React from "react"
+import { Outlet } from "react-router-dom"
+import Sidebar from "../components/common/Sidebar"
+import WelcomeBar from "../components/common/WelcomeBar"
 
 const MainLayout = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-
   return (
-    <div >
-      
+    <div className="app-layout">
       <Sidebar />
-
-      <div>
-        
-        <WelcomeBar user={user} />
-
-        
-        <div >
+      <div className="main-area">
+        <WelcomeBar />
+        <div className="page-content">
           <Outlet />
         </div>
-
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default MainLayout;
+export default MainLayout
