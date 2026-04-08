@@ -1,0 +1,14 @@
+package com.hackathon.backend.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserUpdateRequest {
+    private String name;
+    private String contact;
+    private String address;
+}
