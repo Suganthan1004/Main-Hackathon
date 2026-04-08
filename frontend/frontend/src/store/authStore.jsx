@@ -5,37 +5,47 @@ const AuthContext = createContext()
 
 export const useAuth = () => useContext(AuthContext)
 
+// Helper to read from localStorage synchronously
+const getInitialToken = () => {
+  try {
+    return localStorage.getItem("token") || null
+  } catch {
+    return null
+  }
+}
+
+const getInitialUser = () => {
+  try {
+    const savedUser = localStorage.getItem("user")
+    return savedUser ? JSON.parse(savedUser) : null
+  } catch {
+    return null
+  }
+}
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [token, setToken] = useState(null)
+  // Initialize state directly from localStorage (synchronous — no flash of logged-out state)
+  const [user, setUser] = useState(getInitialUser)
+  const [token, setToken] = useState(getInitialToken)
   const [loading, setLoading] = useState(false)
 
-  // hydrate from localstorage on mount
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token")
-    const savedUser = localStorage.getItem("user")
-    if (savedToken && savedUser) {
-      setToken(savedToken)
-      setUser(JSON.parse(savedUser))
-    }
-  }, [])
-
-  // Save to localStorage whenever user or token changes
+  // Persist token to localStorage whenever it changes
   useEffect(() => {
     if (token) {
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", token)
     } else {
-      localStorage.removeItem("token");
+      localStorage.removeItem("token")
     }
-  }, [token]);
+  }, [token])
 
+  // Persist user to localStorage whenever it changes
   useEffect(() => {
     if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(user))
     } else {
-      localStorage.removeItem("user");
+      localStorage.removeItem("user")
     }
-  }, [user]);
+  }, [user])
 
   const loginUser = async (credentials) => {
     setLoading(true)
@@ -63,7 +73,6 @@ export const AuthProvider = ({ children }) => {
 
   const updateUserState = (updatedUser) => {
     setUser(updatedUser)
-    localStorage.setItem("user", JSON.stringify(updatedUser))
   }
 
   const isLoggedIn = !!token
@@ -77,4 +86,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   )
 }
-
