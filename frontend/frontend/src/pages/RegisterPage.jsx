@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoginForm from '../components/auth/LoginForm';
-import { login } from '../services/authService';
+import RegisterForm from '../components/auth/RegisterForm';
+import { register } from '../services/authService';
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (credentials) => {
+  const handleRegister = async (data) => {
     setError('');
     setLoading(true);
     try {
-      await login(credentials);
-      navigate('/restaurants');
+      await register(data);
+      navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -23,11 +23,11 @@ const LoginPage = () => {
 
   return (
     <div style={styles.page}>
-      <LoginForm onLogin={handleLogin} />
+      <RegisterForm onRegister={handleRegister} />
       {error && <p style={styles.error}>{error}</p>}
-      {loading && <p style={styles.loading}>Logging in...</p>}
+      {loading && <p style={styles.loading}>Creating account...</p>}
       <p style={styles.linkText}>
-        Don't have an account? <a href="/register" style={styles.link}>Register here</a>
+        Already have an account? <a href="/login" style={styles.link}>Login here</a>
       </p>
     </div>
   );
@@ -66,4 +66,4 @@ const styles = {
   }
 };
 
-export default LoginPage;
+export default RegisterPage;
