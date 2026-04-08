@@ -3,7 +3,7 @@ import { USE_MOCK } from "./config"
 
 const delay = (ms) => new Promise(r => setTimeout(r, ms))
 
-// mock auth for frontend testing
+// mock
 const mockLogin = async (credentials) => {
   await delay(500)
   const dummyToken = "dummy-jwt-token-12345"
@@ -17,10 +17,10 @@ const mockLogin = async (credentials) => {
 
 const mockRegister = async (userData) => {
   await delay(500)
-  return { message: "Registration successful", user: userData }
+  return { message: "User registered successfully" }
 }
 
-// real backend calls
+// real
 const realLogin = async (credentials) => {
   const response = await api.post("/auth/login", credentials)
   return response.data
@@ -31,7 +31,6 @@ const realRegister = async (userData) => {
   return response.data
 }
 
-// exported functions pick based on flag
 export const login = USE_MOCK ? mockLogin : realLogin
 export const register = USE_MOCK ? mockRegister : realRegister
 

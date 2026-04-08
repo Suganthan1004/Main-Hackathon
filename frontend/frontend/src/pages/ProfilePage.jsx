@@ -5,8 +5,8 @@ import { updateUser } from "../services/userService"
 const ProfilePage = () => {
   const { user, updateUserState } = useAuth()
   const [name, setName] = useState(user?.name || "")
-  const [email, setEmail] = useState(user?.email || "")
-  const [password, setPassword] = useState("")
+  const [contact, setContact] = useState(user?.contact || "")
+  const [address, setAddress] = useState(user?.address || "")
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
@@ -17,17 +17,12 @@ const ProfilePage = () => {
     setError("")
     setLoading(true)
 
-    const payload = {}
-    if (name) payload.name = name
-    if (email) payload.email = email
-    if (password) payload.password = password
+    const payload = { name, contact, address }
 
     try {
-      const updatedUser = await updateUser(payload)
-      // update context with new data
-      updateUserState({ ...user, ...payload, ...updatedUser })
+      await updateUser(payload)
+      updateUserState(payload)
       setMessage("Profile updated successfully")
-      setPassword("")
     } catch (err) {
       setError(err.response?.data?.message || "Update failed")
     } finally {
@@ -41,32 +36,25 @@ const ProfilePage = () => {
 
       <form className="profile-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label className="form-label">Name</label>
-          <input
-            className="form-input"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div className="form-group">
           <label className="form-label">Email</label>
-          <input
-            className="form-input"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <input className="form-input" type="email" value={user?.email || ""} disabled
+            style={{ background: "#f5f5f5", color: "#999" }} />
         </div>
         <div className="form-group">
-          <label className="form-label">New Password</label>
-          <input
-            className="form-input"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Leave blank to keep current"
-          />
+          <label className="form-label">Name</label>
+          <input className="form-input" type="text" value={name}
+            onChange={(e) => setName(e.target.value)} />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Contact</label>
+          <input className="form-input" type="tel" value={contact}
+            onChange={(e) => setContact(e.target.value)} />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Address</label>
+          <input className="form-input" type="text" value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Your default delivery address" />
         </div>
         <button className="form-submit-btn" type="submit" disabled={loading}>
           {loading ? "Updating..." : "Update Profile"}

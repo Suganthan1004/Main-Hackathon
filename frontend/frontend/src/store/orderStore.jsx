@@ -25,7 +25,7 @@ export const OrderProvider = ({ children }) => {
     try {
       await cancelOrderApi(orderId)
       setOrders(prev =>
-        prev.map(o => o.id === orderId ? { ...o, status: "CANCELLED" } : o)
+        prev.map(o => o.orderId === orderId ? { ...o, status: "CANCELLED" } : o)
       )
     } catch (err) {
       console.error("cancel failed", err)

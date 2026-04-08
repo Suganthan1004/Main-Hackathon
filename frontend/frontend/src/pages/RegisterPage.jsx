@@ -8,6 +8,7 @@ const RegisterPage = () => {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [contact, setContact] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
 
@@ -21,7 +22,7 @@ const RegisterPage = () => {
     }
 
     try {
-      await registerUser({ name, email, password })
+      await registerUser({ name, email, password, contact })
       navigate("/login")
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed")
@@ -35,43 +36,28 @@ const RegisterPage = () => {
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">Name</label>
-            <input
-              className="form-input"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+            <input className="form-input" type="text" value={name}
+              onChange={(e) => setName(e.target.value)} required />
           </div>
           <div className="form-group">
             <label className="form-label">Email</label>
-            <input
-              className="form-input"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <input className="form-input" type="email" value={email}
+              onChange={(e) => setEmail(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Contact</label>
+            <input className="form-input" type="tel" value={contact}
+              onChange={(e) => setContact(e.target.value)} required />
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input
-              className="form-input"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <input className="form-input" type="password" value={password}
+              onChange={(e) => setPassword(e.target.value)} required />
           </div>
           <div className="form-group">
             <label className="form-label">Confirm Password</label>
-            <input
-              className="form-input"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
+            <input className="form-input" type="password" value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)} required />
           </div>
           <button className="form-submit-btn" type="submit" disabled={loading}>
             {loading ? "Creating account..." : "Register"}

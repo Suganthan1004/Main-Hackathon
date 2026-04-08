@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null)
   const [loading, setLoading] = useState(false)
 
+  // hydrate from localstorage on mount
   useEffect(() => {
     const savedToken = localStorage.getItem("token")
     const savedUser = localStorage.getItem("user")
@@ -38,14 +39,11 @@ export const AuthProvider = ({ children }) => {
 
   const loginUser = async (credentials) => {
     setLoading(true)
-    try {
-      const data = await loginApi(credentials)
-      setToken(data.token)
-      setUser(data.user)
-      return data
-    } finally {
-      setLoading(false)
-    }
+    const data = await loginApi(credentials)
+    setToken(data.token)
+    setUser(data.user)
+    setLoading(false)
+    return data
   }
 
   const registerUser = async (userData) => {
@@ -64,7 +62,8 @@ export const AuthProvider = ({ children }) => {
   }
 
   const updateUserState = (updatedUser) => {
-    setUser(prev => ({ ...prev, ...updatedUser }))
+    setUser(updatedUser)
+    localStorage.setItem("user", JSON.stringify(updatedUser))
   }
 
   const isLoggedIn = !!token
