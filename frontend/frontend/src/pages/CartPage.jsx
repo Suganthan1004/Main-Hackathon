@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createOrder } from '../services/orderService';
+import { useCart } from '../store/cartStore';
 
 function CartPage() {
   const navigate = useNavigate();
-  // In a real app, cart state would come from context or global store.
-  // For now, this demonstrates the createOrder API call flow.
-  const [cart, setCart] = useState([]);
+  const { cartItems: cart, addToCart, removeFromCart, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -14,17 +13,26 @@ function CartPage() {
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const updateQuantity = (id, delta) => {
-    setCart(cart.map((item) => {
-      if (item.id === id) {
-        const newQty = item.quantity + delta;
-        return newQty > 0 ? { ...item, quantity: newQty } : item;
-      }
-      return item;
-    }));
+    if (delta > 0) {
+      const item = cart.find(i => i.menuItemId === id);
+      addToCart({ id: item.menuItemId, name: item.name, price: item.price });
+    } else {
+      removeFromCart({ id });
+    }
   };
 
   const removeItem = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
+    // We don't have a direct 'remove all of this item' in the context yet, 
+    // but we can call a loop or just leave it for now since context handles decrement to 0.
+    // For now, let's just decrement it. 
+    // Actually, I'll add a 'removeAllFromCart' to context in a bit if needed.
+    // But context decrement to 0 works too.
+    const item = cart.find(i => i.menuItemId === id);
+    if (item) {
+      for (let i = 0; i < item.quantity; i++) {
+        removeFromCart({ id });
+      }
+    }
   };
 
   const handlePlaceOrder = async () => {
@@ -44,7 +52,7 @@ function CartPage() {
       };
       await createOrder(orderPayload);
       setSuccess('Order placed successfully!');
-      setCart([]);
+      clearCart();
       setTimeout(() => navigate('/orders'), 1500);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to place order.');
@@ -78,10 +86,10 @@ function CartPage() {
               <span style={styles.itemPrice}>₹{item.price * item.quantity}</span>
             </div>
             <div style={styles.cardActions}>
-              <button style={styles.qtyBtn} onClick={() => updateQuantity(item.id, -1)}>−</button>
+              <button style={styles.qtyBtn} onClick={() => updateQuantity(item.menuItemId, -1)}>−</button>
               <span style={styles.qty}>{item.quantity}</span>
-              <button style={styles.qtyBtn} onClick={() => updateQuantity(item.id, 1)}>+</button>
-              <button style={styles.removeBtn} onClick={() => removeItem(item.id)}>Remove</button>
+              <button style={styles.qtyBtn} onClick={() => updateQuantity(item.menuItemId, 1)}>+</button>
+              <button style={styles.removeBtn} onClick={() => removeItem(item.menuItemId)}>Remove</button>
             </div>
           </div>
         ))}

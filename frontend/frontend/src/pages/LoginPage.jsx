@@ -2,17 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/auth/LoginForm';
 import { login } from '../services/authService';
+import { useAuth } from '../store/authStore';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const { login: contextLogin } = useAuth();
+
   const handleLogin = async (credentials) => {
     setError('');
     setLoading(true);
     try {
-      await login(credentials);
+      const data = await login(credentials);
+      // data should contain { user, token }
+      contextLogin(data.user, data.token);
       navigate('/restaurants');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
@@ -20,6 +25,7 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <div style={styles.page}>

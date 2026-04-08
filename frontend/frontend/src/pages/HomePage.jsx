@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllRestaurants } from '../services/restaurantService';
-import { isAuthenticated, logout } from '../services/authService';
+import { useAuth } from '../store/authStore';
 
 function HomePage() {
   const navigate = useNavigate();
+  const { isAuthenticated: loggedIn, logout: contextLogout } = useAuth();
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const loggedIn = isAuthenticated();
 
   useEffect(() => {
     fetchRestaurants();
@@ -27,7 +27,7 @@ function HomePage() {
   };
 
   const handleLogout = () => {
-    logout();
+    contextLogout();
     navigate('/login');
   };
 
